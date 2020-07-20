@@ -27,6 +27,9 @@
 #include "ingestor.h"
 #include <vector>
 
+//import page_c++
+#include "../common/pagerank_c++.h"
+
 enum UpdateType { edge_addition_enum, edge_deletion_enum };
 
 #ifdef EDGEDATA
@@ -525,14 +528,39 @@ public:
     cout << "\n";
     current_batch++;
   }
+
+  void pre_compute_pr(){
+       // compute finale pr
+	    memset(A, 0, sizeof(A));
+	    // full A
+	    for(int i = 0; i < n; ++i){
+			vertex &cu = my_graph.V[i];
+			//auto d = cu.getOutDegree();
+			for(int j = 0; j < cu.getOutDegree(); j++){
+				A[cu.getOutNeighbor(j)][i] = 1; // i->cu.getOutNeighrot(j)
+				//cout << i << " " << cu.getOutNeighbor(j) << endl;
+			}
+		}
+	    float *pr = computePR(n, "output/pr_init");	
+		//for(int i = 0; i < n; i++){
+		//	//cout << i << " " << pr[i] << endl;
+		//	cout << i << " " << newPR[i] << endl;
+		//}
+  }
+
   // ======================================================================
   // RUN AND INITIAL COMPUTE
   // ======================================================================
   void run() {
     // print edges
-    my_graph.printEdges("output/edges");
-    // TODO : Update converged_iteration for fullCompute and deltaCompute
+    // my_graph.printEdges("output/edges");
+    // compute finale pr
+	pre_compute_pr();
+	
+	
+	// TODO : Update converged_iteration for fullCompute and deltaCompute
     initialCompute();
+
 
     // ======================================================================
     // Incremental Compute - Get the next update batch from ingestor
