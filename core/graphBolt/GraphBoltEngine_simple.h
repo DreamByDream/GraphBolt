@@ -64,6 +64,28 @@ public:
                     GlobalInfoType>::initTemporaryStructures(start_index,
                                                              end_index);
   }
+
+  void computerWc(int iter){
+  	// 加入计算误差的代码
+	// 设置时间间隔
+	double t = wc_timer.next();
+	if(t < 0.00002){ // 时间间隔太低了不计算
+		return ;
+	}
+	// 计算误差和
+        float wc = 0;
+        parallel_for(uintV v = 0; v < n; v++){
+             wc += abs(vertex_values[iter-1][v]-newPR[v]);
+        }
+        //cout << iter << ": " << wc << endl;
+        // 将结果写入文件
+		//cout << "test" << endl;
+		ofstream wcfile;
+		wcfile.open("output/wcfile", ios::app);
+		wcfile << iter << ": " << wc << endl;
+		wcfile.close();
+  }
+
   // ======================================================================
   // TRADITIONAL INCREMENTAL COMPUTATION
   // ======================================================================
@@ -84,7 +106,7 @@ public:
       for (iter = start_iteration; iter < max_iterations; iter++) {
         // print every iter's vertex_values
 	//parallel_for(uintV v = 0; v < n; v++){
-	  // cout << "iter=" << iter-1 << ", v = " << v << ",value=" << vertex_values[iter-1][v] << endl;
+	//	cout << "iter=" << iter-1 << ", v = " << v << ",value=" << (aggregation_values[iter-1][v]) << endl;
 	//}
 	// initialize timers
         if (ae_enabled) {
@@ -219,7 +241,10 @@ public:
         vertexSubset temp_vs(n, frontier_curr);
         frontier_curr_vs = temp_vs;
 
-        // Convergence check
+		// 加入计算误差的代码
+		computerWc(iter);
+        
+		// Convergence check
         converged_iteration = iter;
         if (frontier_curr_vs.isEmpty()) {
           break;
@@ -679,7 +704,10 @@ public:
         should_switch_now = true;
       }
       iteration_time = iteration_timer.next();
-    }
+    
+		// 加入计算误差的代码：
+		computerWc(iter);
+	}
 
     cout << "Finished batch : " << full_timer.stop() << "\n";
     cout << "Number of iterations : " << converged_iteration << "\n";

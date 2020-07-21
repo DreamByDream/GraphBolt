@@ -29,6 +29,7 @@
 
 //import page_c++
 #include "../common/pagerank_c++.h"
+timer wc_timer;
 
 enum UpdateType { edge_addition_enum, edge_deletion_enum };
 
@@ -530,7 +531,7 @@ public:
   }
 
   void pre_compute_pr(){
-       // compute finale pr
+       // compute final pr
 	    memset(A, 0, sizeof(A));
 	    // full A
 	    for(int i = 0; i < n; ++i){
@@ -552,6 +553,8 @@ public:
   // RUN AND INITIAL COMPUTE
   // ======================================================================
   void run() {
+	// 开始计时:
+	wc_timer.start();
     // print edges
     // my_graph.printEdges("output/edges");
     // compute finale pr
@@ -569,11 +572,15 @@ public:
     while (ingestor.processNextBatch()) {
       edgeArray &edge_additions = ingestor.getEdgeAdditions();
       edgeArray &edge_deletions = ingestor.getEdgeDeletions();
+	  // 每次更新完重新计算最终结果
+	  pre_compute_pr();
       // ingestor.edge_additions and ingestor.edge_deletions have been added
       // to the graph datastructure. Now, refine using it.
       deltaCompute(edge_additions, edge_deletions);
     }
-    freeTemporaryStructures();
+	// 停止计时：
+	wc_timer.stop();
+	freeTemporaryStructures();
   }
 
   void initialCompute() {

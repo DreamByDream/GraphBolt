@@ -78,6 +78,10 @@ public:
       features[i] = object.features[i];
     }
   }
+  float operator-(const float x){
+  	cout << features[0] << " " << features[1] << endl;
+	return features[0] - x;
+  }
   friend ostream &operator<<(ostream &os, const LPVertexData &dt);
 };
 
