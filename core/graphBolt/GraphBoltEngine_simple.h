@@ -69,7 +69,7 @@ public:
   	// 加入计算误差的代码
 	// 设置时间间隔
 	double t = wc_timer.next();
-	if(t < 0.00002){ // 时间间隔太低了不计算
+	if(t < 0.0001){ // 时间间隔太低了不计算
 		return ;
 	}
 	// 计算误差和
@@ -242,7 +242,9 @@ public:
         frontier_curr_vs = temp_vs;
 
 		// 加入计算误差的代码
-		computerWc(iter);
+		if(wc_flag == 1){
+			computerWc(iter);
+		}
         
 		// Convergence check
         converged_iteration = iter;
@@ -706,7 +708,9 @@ public:
       iteration_time = iteration_timer.next();
     
 		// 加入计算误差的代码：
-		computerWc(iter);
+		if(wc_flag == 1){
+	  		computerWc(iter);
+		}
 	}
 
     cout << "Finished batch : " << full_timer.stop() << "\n";

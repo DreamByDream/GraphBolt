@@ -28,8 +28,9 @@
 #include <vector>
 
 //import page_c++
-#include "../common/pagerank_c++.h"
-timer wc_timer;
+#include "../common/pagerank_c++2.h"
+timer wc_timer;   // 用于计算误差的计时
+int wc_flag = 0; // 是否进行误差计算
 
 enum UpdateType { edge_addition_enum, edge_deletion_enum };
 
@@ -532,14 +533,16 @@ public:
 
   void pre_compute_pr(){
        // compute final pr
-	    memset(A, 0, sizeof(A));
+	   // memset(A, 0, sizeof(A));
 	    // full A
 	    for(int i = 0; i < n; ++i){
 			vertex &cu = my_graph.V[i];
 			//auto d = cu.getOutDegree();
 			for(int j = 0; j < cu.getOutDegree(); j++){
-				A[cu.getOutNeighbor(j)][i] = 1; // i->cu.getOutNeighrot(j)
+				//A[cu.getOutNeighbor(j)][i] = 1; // i->cu.getOutNeighro(j)
 				//cout << i << " " << cu.getOutNeighbor(j) << endl;
+				in_ver[cu.getOutNeighbor(j)].push_back(i); //记录该点的入度
+				out_num[i]++; // i点的出度+1
 			}
 		}
 	    float *pr = computePR(n, "output/pr_init");	
@@ -558,8 +561,11 @@ public:
     // print edges
     // my_graph.printEdges("output/edges");
     // compute finale pr
-	pre_compute_pr();
-	
+	//cout << "---" << wc_flag << endl;
+	if(wc_flag == 1){
+	//	cout << "+++" << wc_flag << endl;
+		pre_compute_pr();
+	}
 	
 	// TODO : Update converged_iteration for fullCompute and deltaCompute
     initialCompute();
@@ -573,7 +579,9 @@ public:
       edgeArray &edge_additions = ingestor.getEdgeAdditions();
       edgeArray &edge_deletions = ingestor.getEdgeDeletions();
 	  // 每次更新完重新计算最终结果
-	  pre_compute_pr();
+	  if(wc_flag == 1){	
+	  	pre_compute_pr();
+	  }
       // ingestor.edge_additions and ingestor.edge_deletions have been added
       // to the graph datastructure. Now, refine using it.
       deltaCompute(edge_additions, edge_deletions);
