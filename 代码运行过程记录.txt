@@ -1,0 +1,83 @@
+基本是按照readme中说明来运行的，一下主要记录从0开始配置环境和运行的过程。
+1.安装ubuntu系统(推荐版本18，不要用20版本，不然安装软件很麻烦)(https://www.cnblogs.com/zhumengdexiaobai/p/13322867.html);
+2.安装gcc-5(https://blog.csdn.net/qq_39451578/article/details/107402095);
+3.按照说明运行代码：
+1)安装mimalloc,通过以下代码安装：
+./install_mimalloc.sh
+	运行可能会出现的问题：
+		-没有git命令，安装git:
+			sudo apt install git
+		-没有cmake命令,安装cmake:
+			sudo apt install cmake
+		-没有make命令，安装make：
+			sudo apt install make
+		-cmake执行出错，没有安装g++(安装g++-5，参照安装gcc-5的方法):
+			sudo apt install g++
+		-如果你是在虚拟机上运行的还会碰到一个麻烦：CMake Error:cmake_symslink_library:
+		System Error:Operation not supported 或者 CMake Error:cmake_symslink_library:
+		System Error:Read-only file system.
+		解决办法是：
+			创建链接不成功，要确定当前账户是否有权限在编译的目录中有创建链接的权限，比如，你
+			如果是在一个windows机器上的共享文件夹中编译，就没法创建链接，就会失败，需要把源码
+			复制到本地的目录中(即linux下的目录)在编译。
+	出现：error while loading share libraries: libmimalloc.so.1.6....问题
+			需要配置LD_PRELOAD这个环境变量,其值就是在install_mimalloc.sh运行得到的：
+			export LD_PRELOAD=/home/yusong/code/graphbolt-master/lib/mimalloc/out/release/libmimalloc.so
+	在进行SNAP格式转为Adjacency 时：
+		(如果出问题可能是g++版本问题：按照上面安装gcc-5的方法发，安装g++-5)
+		cd tools/converters
+		make -j
+		./SNAPtoAdjConverter ../../inputs/google_90w_edge.txt ../../inputs/google_90w_edge.adj
+		
+
+2)运行代码：
+	运行Pagerank的测试：
+		cd app
+		make -j (如果报错可能就是没有配置上面的LD_PRELOAD这个环境变量)
+		./PageRank -numberOfUpdateBatches 2 -nEdges 1000 -streamPath ../inputs/sample_edge_operations.txt -outputFile /tmp/output/pr_output ../inputs/sample_graph.adj
+		./PageRank -numberOfUpdateBatches 2 -nEdges 1000 -streamPath ../inputs/google_90w_change.txt -outputFile /tmp/output/pr_output ../inputs/google_90w_edge.adj
+		如果上面的命令正常运行，会看到运行的结果。
+	snap格式的边转为adj格式：
+		cd tools/generators
+		make -j
+		./SNAPtoAdjConverter ../../inputs/google_90w_edge.txt ../../inputs/google_90w_edge.adj
+		
+3)代码修改：
+目标：
+	隔一段时间，比如1秒或者两秒输出当前结果状态，当前结果状态包括每个顶点的当前pr值
+	和最终pr值之差的绝对值的总和，每个顶点的最终pr值我们提前算好，然后当一个输入给传进去。
+代码执行路径：
+	main->compute()->PageRank.c->run()->GraphBoltEngine.h的run()
+	->initialCompute()/deltaCompute()
+	->traditionalIncrementalComputation()/deltaCompute()
+修改内容：
+	1.输出路径：
+		源代码运行命令中指定的输出路径为：-outputFile /tmp/output/pr_output
+		在app文件夹下新建一个文件夹：output
+		将输出路径修改为：-outputFile output/pr_output
+		运行命令：./PageRank -numberOfUpdateBatches 2 -nEdges 1000 -streamPath ../inputs/sample_edge_operations.txt -outputFile output/pr_output ../inputs/sample_graph.adj
+		运行结果就在：app/output路径下
+	2.增加了文件：./core/comment/pagerank_c++.h,用于计算每个顶点的PR值；
+	3.修改的文件：
+		1)GraphBoltEngine: 增加了：compute_pr()函数；在run()中增加了计算最终PR值的代码；
+		2)GraphBoltEngine_simple.h: 增加了：computerWc(int iter)函数；
+			在deltaCompute()和traditionalIncrementalComputation()中分别加了一行计算误差的代码。
+		3)为LabelPropagation.C中的：LPVertexData类加了一个减法重载。
+		4)GraphBoltEngine: 加了一个计时器。
+
+	
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
