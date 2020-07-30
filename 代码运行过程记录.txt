@@ -38,12 +38,16 @@ export LD_PRELOAD=XXXXX/lib/mimalloc/out/release/libmimalloc.so(跟这个类似)
 		make -j (如果报错可能就是没有配置上面的LD_PRELOAD这个环境变量)
 		./PageRank -numberOfUpdateBatches 2 -nEdges 1000 -streamPath ../inputs/sample_edge_operations.txt -outputFile /tmp/output/pr_output ../inputs/sample_graph.adj
 		./PageRank -numberOfUpdateBatches 2 -nEdges 1000 -streamPath ../inputs/google_90w_change.txt -outputFile /tmp/output/pr_output ../inputs/google_90w_edge.adj
+		
+		./PageRank -numberOfUpdateBatches 0 -nEdges 1000 -streamPath ../inputs/vertex_inc_data.1%.txt -outputFile /tmp/output/pr_output ../inputs/edge.adj
+		
 		如果上面的命令正常运行，会看到运行的结果。
 	snap格式的边转为adj格式：
 		cd tools/generators
 		make -j
 		./SNAPtoAdjConverter ../../inputs/google_90w_edge.txt ../../inputs/google_90w_edge.adj
 		./SNAPtoAdjConverter ../../inputs/edge_4.5k.txt ../../inputs/edge_4.5k.adj
+		./SNAPtoAdjConverter ../../inputs/edge.txt ../../inputs/edge.adj
 		
 3)代码修改：
 目标：
@@ -67,3 +71,15 @@ export LD_PRELOAD=XXXXX/lib/mimalloc/out/release/libmimalloc.so(跟这个类似)
 			在deltaCompute()和traditionalIncrementalComputation()中分别加了一行计算误差的代码。
 		3)为LabelPropagation.C中的：LPVertexData类加了一个减法重载。
 		4)GraphBoltEngine: 加了一个计时器。
+		
+运行过程：
+1.在GraphBolt目录下运行：
+	./install_mimalloc.sh
+	添加路线：export LD_PRELOAD=/home/
+2.在apps下：
+    make PageRank
+	./PageRank -numberOfUpdateBatches 0 -nEdges 1000 -streamPath ../inputs/vertex_inc_data.1%.txt -outputFile /tmp/output/pr_output ../inputs/edge.adj
+		
+		
+		
+		
