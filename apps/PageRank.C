@@ -278,10 +278,10 @@ void printAdditionalData(ofstream &output_file, const uintV &v,
 // ======================================================================
 template <class vertex> void compute(graph<vertex> &G, commandLine config) {
   uintV n = G.n;
-  int max_iters = config.getOptionLongValue("-maxIters", 80);
+  int max_iters = config.getOptionLongValue("-maxIters", 300);
   max_iters += 1;
   double epsilon = 0.01;
-  double damping = 0.85;
+  double damping = 0.80;
 
   PageRankInfo global_info(n, epsilon, damping);
   parallel_for(uintV i = 0; i < n; i++) {
