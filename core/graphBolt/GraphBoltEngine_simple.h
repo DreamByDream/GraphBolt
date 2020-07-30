@@ -206,7 +206,8 @@ public:
                             vertex_values[iter - 1][v], new_value, global_info);
 
             // Check if change is significant
-            if ( isChanged(new_value, vertex_values[iter - 1][v], global_info)) {
+			// 加了 1 or : 关闭优化
+            if (1 or isChanged(new_value, vertex_values[iter - 1][v], global_info)) {
               // change is significant. Update vertex_values
               vertex_values[iter][v] = new_value;
               // Set active for next iteration.
@@ -248,6 +249,7 @@ public:
         
 		// Convergence check
         converged_iteration = iter;
+		// 关闭了它的检测退出：
 ///        if (frontier_curr_vs.isEmpty()) {
 ////
 //测试
