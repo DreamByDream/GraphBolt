@@ -60,9 +60,11 @@ int parallel_main(int argc, char *argv[]) {
     G.del();
   } else {
     // asymmetric graph
+    cout << "------------s-- 开始构建图-------------" << endl;
     graph<asymmetricVertex> G =
         readGraph<asymmetricVertex>(iFile, symmetric, simpleFlag, debugFlag);
     cout << "Graph created -asy" << endl;
+    cout << "------------end------------------------" << endl;
     compute(G, P);
     G.del();
   }

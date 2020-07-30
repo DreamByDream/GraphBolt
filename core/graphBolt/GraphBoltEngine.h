@@ -27,6 +27,7 @@
 #include "ingestor.h"
 #include <vector>
 
+
 //import page_c++
 #include "../common/pagerank_c++2.h"
 timer wc_timer;   // 用于计算误差的计时
@@ -531,6 +532,8 @@ public:
     current_batch++;
   }
 
+ // -----------------------s---------------------------------
+ // 自己计算Pr值的代码
   void pre_compute_pr(){
        // compute final pr
 	   // memset(A, 0, sizeof(A));
@@ -551,22 +554,33 @@ public:
 		//	cout << i << " " << newPR[i] << endl;
 		//}
   }
+  //----------------------end----------------------------------------
 
   // ======================================================================
   // RUN AND INITIAL COMPUTE
   // ======================================================================
   void run() {
-	// 开始计时:
-	wc_timer.start();
+    //------------------------s----------------------------------
+    // 开始计时， 并用自己的函数计算初始的pr值:
+    cout << "---------s-- 用自己的函数计算初始的pr值" << endl;
+    wc_timer.start();
     // print edges
     // my_graph.printEdges("output/edges");
+    
     // 计算误差：
     if(wc_flag == 1){
          pre_compute_pr();
     }
+    cout << "---------end-------------------------------" << endl;
+    //----------------------end---------------------------------
 
+    //----------------------s-----------------------------------
+    // graphbolt第一次计算pr值：
     // TODO : Update converged_iteration for fullCompute and deltaCompute
-    initialCompute();
+    cout << "---------s-- graphbolt第一次计算pr---------" << endl;
+     initialCompute();
+    cout << "---------end------------------------------" << endl;
+    //----------------------end---------------------------------
     
     //测试
     //cout << "第一次计算：n=" << n <<  endl;
@@ -581,13 +595,20 @@ public:
     while (ingestor.processNextBatch()) {
       edgeArray &edge_additions = ingestor.getEdgeAdditions();
       edgeArray &edge_deletions = ingestor.getEdgeDeletions();
-	  // 每次更新完重新计算最终结果
-	  if(wc_flag == 1){	
-	  	pre_compute_pr();
-	  }
+      
+      //---------------------s---------------------------------------------   
+      // 每次更新完利用自己的函数重新计算最终结果
+      if(wc_flag == 1){	
+          pre_compute_pr();
+      }
+      //---------------------end-------------------------------------------
+ 
       // ingestor.edge_additions and ingestor.edge_deletions have been added
       // to the graph datastructure. Now, refine using it.
-      deltaCompute(edge_additions, edge_deletions);
+      //---------------------s---------------------------------------------
+      // 每次跟新完：graphbolt重新计算pr值：
+       deltaCompute(edge_additions, edge_deletions);
+      //---------------------end-------------------------------------------
     }
 	// 停止计时：
 	wc_timer.stop();
