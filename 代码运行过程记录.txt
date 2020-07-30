@@ -28,7 +28,9 @@
 		cd tools/converters
 		make -j
 		./SNAPtoAdjConverter ../../inputs/google_90w_edge.txt ../../inputs/google_90w_edge.adj
-		
+		./SNAPtoAdjConverter ../../inputs/edge_4k.txt ../../inputs/edge_4k.adj
+如果上面的运行成功，按输出提示配置(复制输出，然后运行)：
+export LD_PRELOAD=XXXXX/lib/mimalloc/out/release/libmimalloc.so(跟这个类似)
 
 2)运行代码：
 	运行Pagerank的测试：
@@ -41,6 +43,7 @@
 		cd tools/generators
 		make -j
 		./SNAPtoAdjConverter ../../inputs/google_90w_edge.txt ../../inputs/google_90w_edge.adj
+		./SNAPtoAdjConverter ../../inputs/edge_4.5k.txt ../../inputs/edge_4.5k.adj
 		
 3)代码修改：
 目标：
@@ -64,20 +67,3 @@
 			在deltaCompute()和traditionalIncrementalComputation()中分别加了一行计算误差的代码。
 		3)为LabelPropagation.C中的：LPVertexData类加了一个减法重载。
 		4)GraphBoltEngine: 加了一个计时器。
-
-	
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
