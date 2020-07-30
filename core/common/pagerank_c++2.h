@@ -10,7 +10,7 @@ Time: 2020-7-22 13:58
 #include<fstream>
 #include<cmath>
 using namespace std;
-#define MAX 1000000
+#define MAX 10000000
 
 vector <int> in_ver[MAX]; // 存储各点入度的点 
 int out_num[MAX]; // 存储各点出度数量 
@@ -45,7 +45,7 @@ float* computePR(int n, char* outpath){
 	}  
     // 记录迭代次数
 	int cnt = 0;
-	while(cnt < 200){
+	while(cnt < 500){
 		cnt++;
 		if(cnt % 2 == 1){
 			getPR(oldPR, newPR, n); // newPR迭代存入oldPR 
