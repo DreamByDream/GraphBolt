@@ -68,18 +68,22 @@ public:
   void computerWc(int iter){
   	// 加入计算误差的代码
 	// 设置时间间隔
-	double t = wc_timer.next();
-	if(t < 0.0001){ // 时间间隔太低了不计算
+	double t = wc_timer.getTime() - wc_timer.lastTime;
+	if(t < 0.01){ // 时间间隔太低了不计算
 		return ;
 	}
+	//cout << "误差计算---" << t << endl;
+	wc_timer.next();
 	// 计算误差和
         float wc = 0;
         parallel_for(uintV v = 0; v < n; v++){
-             wc += abs(vertex_values[iter-1][v]-newPR[v]);
+             wc += abs(vertex_values[iter][v]-newPR[v]);
+	//     if(v < 3){
+	//     	cout << v << " " <<  newPR[v] << " " << vertex_values[iter][v] << endl;
+	//     }
         }
         //cout << iter << ": " << wc << endl;
         // 将结果写入文件
-		//cout << "test" << endl;
 		ofstream wcfile;
 		wcfile.open("output/wcfile", ios::app);
 		wcfile << iter << ": " << wc << endl;
@@ -104,10 +108,6 @@ public:
 
     } else {
       for (iter = start_iteration; iter < max_iterations; iter++) {
-        // print every iter's vertex_values
-	//parallel_for(uintV v = 0; v < n; v++){
-	//	cout << "iter=" << iter-1 << ", v = " << v << ",value=" << (aggregation_values[iter-1][v]) << endl;
-	//}
 	// initialize timers
         if (ae_enabled) {
           phase_timer.start();
@@ -206,7 +206,7 @@ public:
                             vertex_values[iter - 1][v], new_value, global_info);
 
             // Check if change is significant
-            if (isChanged(new_value, vertex_values[iter - 1][v], global_info)) {
+            if ( isChanged(new_value, vertex_values[iter - 1][v], global_info)) {
               // change is significant. Update vertex_values
               vertex_values[iter][v] = new_value;
               // Set active for next iteration.
@@ -248,10 +248,21 @@ public:
         
 		// Convergence check
         converged_iteration = iter;
-        if (frontier_curr_vs.isEmpty()) {
-          break;
-        }
+///        if (frontier_curr_vs.isEmpty()) {
+////
+//测试
+//cout << "第一次计算：n=" << n <<  endl;
+//for(uintV v = 0; v < 10; v++){
+//  cout << v << " " << newPR[v] << " " << vertex_values[iter][v] << endl;
+//}
+/////
+//	      	break;
+//        }
       }
+cout << "第一次计算：n=" << n <<  endl;
+for(uintV v = 0; v < 10; v++){
+	  cout << v << " " << newPR[v] << " " << vertex_values[max_iterations-1][v] << endl;
+}
     }
     if (ae_enabled) {
       adaptive_executor.updateEquation(converged_iteration);

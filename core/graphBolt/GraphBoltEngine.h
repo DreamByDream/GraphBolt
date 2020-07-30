@@ -30,7 +30,7 @@
 //import page_c++
 #include "../common/pagerank_c++2.h"
 timer wc_timer;   // 用于计算误差的计时
-int wc_flag = 0; // 是否进行误差计算
+int wc_flag = 1; // 是否进行误差计算
 
 enum UpdateType { edge_addition_enum, edge_deletion_enum };
 
@@ -535,17 +535,17 @@ public:
        // compute final pr
 	   // memset(A, 0, sizeof(A));
 	    // full A
-	    for(int i = 0; i < n; ++i){
+	    for(uintV i = 0; i < n; ++i){
 			vertex &cu = my_graph.V[i];
 			//auto d = cu.getOutDegree();
-			for(int j = 0; j < cu.getOutDegree(); j++){
+			for(uintV j = 0; j < cu.getOutDegree(); j++){
 				//A[cu.getOutNeighbor(j)][i] = 1; // i->cu.getOutNeighro(j)
 				//cout << i << " " << cu.getOutNeighbor(j) << endl;
 				in_ver[cu.getOutNeighbor(j)].push_back(i); //记录该点的入度
 				out_num[i]++; // i点的出度+1
 			}
 		}
-	    float *pr = computePR(n, "output/pr_init");	
+	    float *pr = computePR(n, "output/pr_init");
 		//for(int i = 0; i < n; i++){
 		//	//cout << i << " " << pr[i] << endl;
 		//	cout << i << " " << newPR[i] << endl;
@@ -560,16 +560,19 @@ public:
 	wc_timer.start();
     // print edges
     // my_graph.printEdges("output/edges");
-    // compute finale pr
-	//cout << "---" << wc_flag << endl;
-	if(wc_flag == 1){
-	//	cout << "+++" << wc_flag << endl;
-		pre_compute_pr();
-	}
-	
-	// TODO : Update converged_iteration for fullCompute and deltaCompute
-    initialCompute();
+    // 计算误差：
+    if(wc_flag == 1){
+         pre_compute_pr();
+    }
 
+    // TODO : Update converged_iteration for fullCompute and deltaCompute
+    initialCompute();
+    
+    //测试
+    //cout << "第一次计算：n=" << n <<  endl;
+    //parallel_for(uintV v = 0; v < 10; v++){
+    //   cout << v << " " << newPR[v] << " " << vertex_values[199][v] << endl; 
+    //}
 
     // ======================================================================
     // Incremental Compute - Get the next update batch from ingestor
